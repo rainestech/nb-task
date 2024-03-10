@@ -1,0 +1,5 @@
+controllers:
+    resource:
+        path: ../src/Infrastructure/Delivery/
+        namespace: App\Infrastructure\Delivery
+    type: attribute

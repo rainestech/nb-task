@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+
+  users:
+    build:
+      context: .
+      dockerfile: users-service/Dockerfile
+    volumes:
+      - ./users-service:/var/www
+    depends_on:
+      - mysql
+      - rabbitmq
+  notifications:
+    build:
+      context: .
+      dockerfile: notification-service/Dockerfile
+    volumes:
+      - ./notification-service:/var/www
+    depends_on:
+      - mysql
+      - rabbitmq
+    env_file:
+      - ./notification-service/.env
+
+  mysql:
+    image: mysql:8.0
+    volumes:
+      - ./init/mysql/01.sql:/docker-entrypoint-initdb.d/01.sql
+      - mysql_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "${MYSQL_PORT}:3306"
+    env_file:
+      - ./users-service/.env
+
+  rabbitmq:
+    image: rabbitmq:management
+    environment:
+      RABBITMQ_USER: ${RABBITMQ_USER}
+      RABBITMQ_PASS: ${RABBITMQ_PASSWORD}
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    env_file:
+      - ./users-service/.env
+
+  users-gateway:
+    image: caddy:2-alpine
+    volumes:
+      - ./users-service/Caddyfile:/etc/caddy/Caddyfile
+      - ./users-service:/var/www
+    ports:
+      - 8090:80
+    depends_on:
+      - users
+    env_file:
+      - ./users-service/.env
+
+  notifications-gateway:
+    image: caddy:2-alpine
+    volumes:
+      - ./notification-service/Caddyfile:/etc/caddy/Caddyfile
+      - ./notification-service:/var/www
+    ports:
+      - 8100:80
+    depends_on:
+      - notifications
+    env_file:
+      - ./notification-service/.env
+
+volumes:
+  mysql_data:
