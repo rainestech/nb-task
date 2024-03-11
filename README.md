@@ -23,9 +23,11 @@ Bonus points if you use DDD or/and CQRS.
 ## Installation
 1. Clone the repository
 2. in the root directory of the project, run `make install`
+3. run `make run-migrations` to run the database migrations
+4. run `make consume-messages` to start consuming messages from the message broker (RabbitMQ)
 
 ## Usage
-1. Start the application by running `make start`
+1. Start the application by running `make start && make consume-messages`
 2. Open your browser and navigate to `http://localhost:8090` to access the user-service application
 3. Notifications service runs on `http://localhost:8100`
 4. Open Postman or any other API client and make a POST request to `http://localhost:8090/users` with the following payload:

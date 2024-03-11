@@ -15,9 +15,9 @@ run-tests: ## Run the project tests
 
 run-migrations: ## Run the project migrations
 	docker-compose exec users php bin/console doctrine:migrations:migrate --no-interaction && \
-	docker-compose exec users php bin/console --env=test doctrine:migrations:migrate
+	docker-compose exec users php bin/console --env=test doctrine:migrations:migrate --no-interaction
 
 consume-messages: ## Consume messages from the queue and process them
 	docker-compose exec notifications php bin/console messenger:consume external -vv
 
-install: start install-dependencies run-migrations consume-messages ## Install the project
+install: start install-dependencies ## Install the project
